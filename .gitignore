@@ -1,0 +1,23 @@
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Notebooks
+
+# Data
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Results
+results/
+!results/.gitkeep
+
+# OS & IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp

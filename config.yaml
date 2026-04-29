@@ -1,0 +1,136 @@
+randomness_strategy:
+  seed: 42
+data:
+  source: 20250912_PCD_Refset_Content
+  paths:
+    pcd_input: /content/drive/My Drive/Career Accelerator/Employer_Project/GitHub/data/raw/20250912_PCD_Refset_Content.txt
+    snomed_desc_input: /content/drive/My Drive/Career Accelerator/Employer_Project/GitHub/data/raw/sct2_Description_MONOSnapshot-en_GB_20250924.txt
+    snomed_rel_input: /content/drive/My Drive/Career Accelerator/Employer_Project/GitHub/data/raw/sct2_Relationship_MONOSnapshot_GB_20250924.txt
+    snomed_code_usage: /content/drive/My Drive/Career Accelerator/Employer_Project/GitHub/data/usage/SNOMED_code_usage_2024-25.txt
+  source_label:
+    pcd_input: NHS Primary Care Domain Reference Set (September 2025)
+    snomed_input: SnomedCT Monolith RF2 PRODUCTION (September 2025) T120000Z
+  chunking:
+    max_chars: 28672
+    codes_per_subchunk: 50
+    relationships:
+      '116680003': is_a
+      '363698007': finding_site
+      '363704007': procedure_site
+      '246075003': causative_agent
+      '363714003': investigation
+      '260686004': method
+      '272741003': laterality
+      '127489000': ingredient
+      '263502005': course
+      '370135005': pathological_process
+      '47429007': associated_with
+  check:
+    keyword: 'flu '
+    n_preview: 10
+retrieval:
+  tf_idf:
+    ngram_range: !!python/tuple
+    - 1
+    - 5
+    max_df: 0.85
+    min_df: 2
+    sublinear_tf: true
+  embedding:
+    model: nomic-ai/nomic-embed-text-v1.5
+    backend: sentence_transformers
+    batch_size: 32
+    progress_every: 100
+    num_ctx: 8192
+    prefix: search_document
+    trust_remote_code: true
+    device: cuda
+    normalize_embeddings: true
+    show_progress_bar: false
+  retrieving:
+    model: nomic-ai/nomic-embed-text-v1.5
+    backend: sentence_transformers
+    batch_size: 32
+    progress_every: 100
+    num_ctx: 8192
+    prefix: search_query
+    trust_remote_code: true
+    device: cuda
+    normalize_embeddings: true
+    show_progress_bar: false
+    sparse_min_score: 0.05
+    sparse_top_k: 30
+    dense_min_score: 0.6
+    dense_top_k: 30
+    rrf_min_ratio: 0.8
+    rrf_top_k: 30
+    rrf_k: 60
+  graph_expansion:
+    enabled: true
+    expansion_top_k: 10
+    expansion_min_score: 0.7
+    expansion_rrf_weight: 0.5
+  code_rescore:
+    chunk_weight: 0.5
+    code_weight: 0.5
+  test_queries:
+  - Patients who have cardiovascular disease.
+llm:
+  model: phi4
+  temperature: 0
+  num_ctx: 16384
+  num_predict: 2048
+  max_codes_to_llm: 200
+agent:
+  model: phi4
+  temperature: 0
+  num_ctx: 16384
+  num_predict: 2048
+  min_rrf_score: 0.015
+  min_blended_score: 0.15
+  min_new_chunks: 1
+  max_steps:
+    simple: 50
+    moderate: 100
+    complex: 200
+    default: 100
+query_router:
+  model: phi4
+  temperature: 0
+  num_ctx: 4096
+  num_predict: 512
+  types:
+    diagnosis:
+      primary_axes:
+      - is_a
+      - finding_site
+      - causative_agent
+      - course
+      - associated_with
+    laboratory_test:
+      primary_axes:
+      - investigation
+      - finding_site
+      - associated_with
+    medication:
+      primary_axes:
+      - ingredient
+      - associated_with
+    procedure:
+      primary_axes:
+      - procedure_site
+      - method
+      - laterality
+      - associated_with
+    composite:
+      primary_axes:
+      - is_a
+      - finding_site
+      - investigation
+      - ingredient
+      - associated_with
+evaluation:
+  benchmark_code_col: code
+  benchmark_description_col: term
+  normalize_embeddings: true
+  show_progress_bar: false
