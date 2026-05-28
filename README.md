@@ -2,7 +2,7 @@
 
 *April 2026*
 
-**Authors:** Darya Yarparvar, Olga Shapovalova, Kseniia Warren, Abdullah Sheikh, Eshwar Meduri, Joe Flanagan
+**Authors:** Darya Yarparvar (Technical Lead), Olga Shapovalova, Kseniia Warren, Abdullah Sheikh, Eshwar Meduri, Joe Flanagan
 
 ---
 
